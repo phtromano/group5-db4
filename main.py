@@ -1,19 +1,27 @@
 from machine import Pin,PWM
+import time
+#from fanCooler import fanCooler
+
+#cooler = fanCooler(12,13)
+
+#cooler.coolerOn()
+
+from led import LED
+light = LED()
+#light = Pin(13,Pin.OUT)
+
+while True:
+    #light.on()
+    light.turn_on_led()
+    time.sleep(1)
+    #light.off()
+    light.turn_off_led()
+    time.sleep(1)
 
 
-#red = PWM(Pin(27))
-##blue = PWM(Pin(33))
-#green = PWM(Pin(32))
-    
-    
-    
-#red.duty(1023)
-#blue.duty(0)
-#green.duty(0)
 
-import rgbLed
 
-rgb = rgbLed()
-rgb.turn_on_led()
+
+
 
 
