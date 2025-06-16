@@ -12,6 +12,6 @@ class RGB_Led:
         self.green.duty(0)
     
     def turn_on_led(self):
-        self.red.duty(1023)
+        self.red.duty(1000)
         self.blue.duty(0)
-        self.green.duty(0)
+        self.green.duty(1000)

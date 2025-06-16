@@ -2,7 +2,7 @@ from machine import PWM,Pin
 class LED:
     
     def __init__(self):
-        self.led = Pin(13,Pin.OUT)
+        self.led = Pin(21,Pin.OUT)
     
     def turn_on_led(self):
         self.led.on()
