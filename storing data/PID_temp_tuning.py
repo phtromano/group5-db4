@@ -1,6 +1,7 @@
 from machine import Pin,ADC,DAC
 from fanCooler import fanCooler
 from coolerpump import Pump  
+from PID import PID
 import utime
 import time
 
@@ -53,39 +54,58 @@ class TempSensor:
 
 # --- Set up system components ---
 cooler = fanCooler(15, 33)              # Adjust pins as needed
-coolerpump = Pump(14, 32, 7000)
+coolerpump = Pump(14, 32, 1000)
 temp_sensor = TempSensor()  # Or the correct pin for your setup
+target_temp = 17.5
+pid = PID(temp_sensor.read_temp(), target_temp)
 
-total_seconds = 10*60               
-interval = 1                       
+pid.setP(0.8)   
+pid.setI(0.03)
+pid.setD(0.2)
 
-filename = "cooling_test.csv"
+total_seconds = 20*60               
+interval = 3                       
+
+filename = "pid_cooling_test.csv"
 with open(filename, "w") as f:
-    f.write("time_s,temperature_C\n")  # CSV header
+    f.write("time_s,temperature_C, u\n")  # CSV header
 
 print("Starting cooling test.")
 
 t0 = time.time()
 for t in range(total_seconds):
-    temp = temp_sensor.read_temp()
+    temps = []
+    for _ in range(3):
+        temps.append(temp_sensor.read_temp())
+        utime.sleep(0.1)  
+    temp = sum(temps) / len(temps)
     elapsed = int(time.time() - t0)
-    if temp > 18:
+    
+    u = pid.PID_values(temp)
+    if u > 0:
+        u=pid.PID_values(temp)
+    else:
+        u=0
+    
+
+    if temp > target_temp:
         cooler.coolerOn()
         cooler.powerHigh()
         coolerpump.setDirection(1)
-        coolerpump.setSpeed(7000)
+        coolerpump.setSpeed(1000)
         print("Cooler on")
-    elif temp <18:
+    elif temp <target_temp:
         cooler.coolerOff()
         coolerpump.setDirection(0)
+        
     
         print("Cooler off")
     with open(filename, "a") as f:
-        f.write("{},{}\n".format(elapsed, temp))
-    print("t = {}s, T = {:.2f}°C".format(elapsed, temp))
+        f.write("{},{},{}\n".format(elapsed, temp, u))
+    print("t = {}s, T = {:.2f}°C, u={}".format(elapsed, temp, u))
     utime.sleep(interval)
 
 cooler.coolerOff()
 coolerpump.setDirection(0)
-coolerpump.setSpeed(1)
 print("Cooling test complete.")
+

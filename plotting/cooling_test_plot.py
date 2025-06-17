@@ -4,7 +4,7 @@ import csv
 time = []
 temperature = []
 
-with open("cooling_test.csv", "r") as f:
+with open("pid_cooling_test.csv", "r") as f:
     reader = csv.reader(f)
     next(reader)
     for row in reader:

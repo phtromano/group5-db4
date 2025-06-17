@@ -2,7 +2,7 @@ class PID:
     def __init__(self, measuredValue, wantedTemperature):
         self.measuredValue = measuredValue
         self.temp = wantedTemperature
-        self.error = [self.measuredValue - self.temp]
+        self.error = [self.temp-self.measuredValue]
         self.lengthError = 1
     
     def setP(self,value):
@@ -16,8 +16,12 @@ class PID:
 
     def PID_values(self, newMeasure):
 
+        
+        if self.lengthError > 10:
+            self.error.pop(0)
+
         self.error.append(newMeasure - self.temp)
-        self.lengthErrorArray += 1
+        self.lengthError +=1
         self.measuredValue = newMeasure
 
 

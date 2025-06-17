@@ -2,21 +2,21 @@ from machine import Pin
 import time
 
 
-class PumpStep:
+class SubPump:
 
-    def __init__(self, direction_pin, step_pin):
-        self.direction = Pin(direction_pin, Pin.OUT)
-        self.step = Pin(step_pin, Pin.OUT)
+    def __init__(self, a2, a1):
+        self.a2 = Pin(a2, Pin.OUT)
+        self.a1 = Pin(a1, Pin.OUT)
     
     def onestep(self):
-        self.step.value(1-self.step.value())
+        self.a1.value(1-self.a1.value())
 
 
     def direction_right(self):
-        self.direction.value(1)
+        self.a2.value(1)
     
     def direction_left(self):
-        self.direction.value(0)
+        self.a2.value(0)
     
     def fullstep(self, numberOfSteps):
 
