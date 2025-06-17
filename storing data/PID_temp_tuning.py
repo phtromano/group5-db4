@@ -52,10 +52,10 @@ class TempSensor:
         print('Temperature: {}°C'.format(steinhart))
         return steinhart
 
-# --- Set up system components ---
-cooler = fanCooler(15, 33)              # Adjust pins as needed
+#System components
+cooler = fanCooler(15, 33)              
 coolerpump = Pump(14, 32, 1000)
-temp_sensor = TempSensor()  # Or the correct pin for your setup
+temp_sensor = TempSensor()  
 target_temp = 17.5
 pid = PID(temp_sensor.read_temp(), target_temp)
 
@@ -68,7 +68,7 @@ interval = 3
 
 filename = "pid_cooling_test.csv"
 with open(filename, "w") as f:
-    f.write("time_s,temperature_C, u\n")  # CSV header
+    f.write("time_s,temperature_C, u\n")  
 
 print("Starting cooling test.")
 
