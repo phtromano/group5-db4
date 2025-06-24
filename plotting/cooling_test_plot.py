@@ -8,7 +8,7 @@ with open("pid_cooling_test.csv", "r") as f:
     reader = csv.reader(f)
     next(reader)
     for row in reader:
-        time.append(int(row[0]))
+        time.append(int(row[0])/60)
         temperature.append(float(row[1]))
 plt.figure(figsize=(8, 5))
 plt.plot(time, temperature, marker='o')

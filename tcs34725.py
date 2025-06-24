@@ -41,7 +41,8 @@ class TCS34725:
         self._active = False
         self.integration_time(2.4)
         sensor_id = self.sensor_id()
-        if sensor_id not in (0x44, 0x10):
+        print("sensor id:", sensor_id)
+        if sensor_id not in (0x4d, 0x44):
             raise RuntimeError("wrong sensor id 0x{:x}".format(sensor_id))
 
     def _register8(self, register, value=None):
@@ -115,13 +116,25 @@ class TCS34725:
 
     def _temperature_and_lux(self, data):
         r, g, b, c = data
-        x = -0.14282 * r + 1.54924 * g + -0.95641 * b
-        y = -0.32466 * r + 1.57837 * g + -0.73191 * b
-        z = -0.68202 * r + 0.77073 * g +  0.56332 * b
+
+        # Optional normalization
+        if c > 0:
+            r /= c
+            g /= c
+            b /= c
+
+        x = max(0.0, -0.14282 * r + 1.54924 * g + -0.95641 * b)
+        y = max(0.0, -0.32466 * r + 1.57837 * g + -0.73191 * b)
+        z = max(0.0, -0.68202 * r + 0.77073 * g +  0.56332 * b)
         d = x + y + z
+
+        if d == 0:
+            return 0.0, 0.0
+
         n = (x / d - 0.3320) / (0.1858 - y / d)
-        cct = 449.0 * n**3 + 3525.0 * n**2 + 6823.3 * n + 5520.33
+        cct = 449.0 * n*3 + 3525.0 * n*2 + 6823.3 * n + 5520.33
         return cct, y
+
 
     def threshold(self, cycles=None, min_value=None, max_value=None):
         if cycles is None and min_value is None and max_value is None:
@@ -153,7 +166,7 @@ class TCS34725:
             raise ValueError("interrupt can only be cleared")
         self.i2c.writeto(self.address, b'\xe6')
 		
-    def html_rgb(data):
+    def html_rgb(self, data):
             r, g, b, c = data
             red = pow((int((r/c) * 256) / 255), 2.5) * 255
             green = pow((int((g/c) * 256) / 255), 2.5) * 255

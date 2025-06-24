@@ -1,6 +1,7 @@
 from machine import Pin,ADC,DAC
 from fanCooler import fanCooler
 from coolerpump import Pump  
+from servo import Servo
 import utime
 import time
 
@@ -17,7 +18,7 @@ ADC_MAX = 1023
 ADC_Vmax = 3.15
 
 class TempSensor:
-    def __init__(self, pinNoTemp = 27):
+    def __init__(self, pinNoTemp = 25):
         self.adc = ADC(Pin(pinNoTemp))
         self.adc.atten(ADC.ATTN_11DB)
         self.adc.width(ADC.WIDTH_10BIT)
@@ -55,9 +56,11 @@ class TempSensor:
 cooler = fanCooler(15, 33)              # Adjust pins as needed
 coolerpump = Pump(14, 32, 7000)
 temp_sensor = TempSensor()  # Or the correct pin for your setup
+algaevalve = Servo(13)
+musselValve = Servo(27)
 
-total_seconds = 10*60               
-interval = 1                       
+total_seconds = 3000*60               
+interval = 3                       
 
 filename = "cooling_test.csv"
 with open(filename, "w") as f:
@@ -65,7 +68,10 @@ with open(filename, "w") as f:
 
 print("Starting cooling test.")
 
+algaevalve.set_angle(90)
+musselValve.set_angle(180)
 t0 = time.time()
+
 for t in range(total_seconds):
     temp = temp_sensor.read_temp()
     elapsed = int(time.time() - t0)

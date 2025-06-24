@@ -12,7 +12,7 @@ class fanCooler:
         self.fan.value(0)
 
     def powerHigh(self):
-        self.power.value(0)
+        self.power.value(1)
     
     def powerLow(self):
-        self.power.value(1)
+        self.power.value(0)

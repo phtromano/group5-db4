@@ -4,7 +4,8 @@ class Pump:
     
     def __init__(self, a2, a1, cyclespeed):
         self.a2 = Pin(a2, Pin.OUT)
-        self.a1 = PWM(Pin(a1), freq = cyclespeed, duty = 256)
+        self.a1 = PWM(Pin(a1), freq = cyclespeed, duty = 0)
+        self._speed = cyclespeed
 
     
     def switchDirection(self):
@@ -15,3 +16,6 @@ class Pump:
     
     def setSpeed(self, cyclespeed):
         self.a1.freq(cyclespeed)
+    
+    def getSpeed(self):
+        return self._speed

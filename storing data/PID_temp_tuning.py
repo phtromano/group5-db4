@@ -2,6 +2,7 @@ from machine import Pin,ADC,DAC
 from fanCooler import fanCooler
 from coolerpump import Pump  
 from PID import PID
+from oled import OLED
 import utime
 import time
 
@@ -53,8 +54,9 @@ class TempSensor:
         return steinhart
 
 #System components
-cooler = fanCooler(15, 33)              
+cooler = fanCooler(33, 15)              
 coolerpump = Pump(14, 32, 1000)
+oledscreen = OLED(22,23)
 temp_sensor = TempSensor()  
 target_temp = 17.5
 pid = PID(temp_sensor.read_temp(), target_temp)
@@ -63,7 +65,7 @@ pid.setP(0.8)
 pid.setI(0.03)
 pid.setD(0.2)
 
-total_seconds = 20*60               
+total_seconds = 300*60               
 interval = 3                       
 
 filename = "pid_cooling_test.csv"
@@ -88,24 +90,32 @@ for t in range(total_seconds):
         u=0
     
 
-    if temp > target_temp:
+    if u>2:
         cooler.coolerOn()
         cooler.powerHigh()
         coolerpump.setDirection(1)
-        coolerpump.setSpeed(1000)
-        print("Cooler on")
-    elif temp <target_temp:
+        coolerpump.setSpeed(int(100*u))
+        print("Cooler full power")
+    elif u<2 and u>0:
+        cooler.coolerOn()
+        cooler.powerLow()
+        coolerpump.setDirection(1)
+        coolerpump.setSpeed(1)
+        print("Cooler low power and pump lower frequency")
+    elif u==0:
         cooler.coolerOff()
         coolerpump.setDirection(0)
+        print("Cooler off")
         
     
         print("Cooler off")
     with open(filename, "a") as f:
         f.write("{},{},{}\n".format(elapsed, temp, u))
     print("t = {}s, T = {:.2f}°C, u={}".format(elapsed, temp, u))
+    oledscreen.display_PID_controls(temp)
     utime.sleep(interval)
 
-cooler.coolerOff()
+cooler.coolerOff()  
 coolerpump.setDirection(0)
 print("Cooling test complete.")
 

@@ -28,5 +28,6 @@ class LightSensor:
         initial_OD = (-math.log10(intesity/self.reference))
         return initial_OD
     
-    
+    def Conc_value(self,optical_density):
+        return 
 
